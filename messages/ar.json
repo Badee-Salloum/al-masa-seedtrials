@@ -1,0 +1,133 @@
+{
+  "app": {
+    "name": "تجارب البذور",
+    "org": "مؤسسة الماسة والنبراس الزراعية"
+  },
+  "nav": {
+    "dashboard": "لوحة المعلومات",
+    "trials": "التجارب",
+    "nurseries": "المشاتل",
+    "followups": "المتابعات",
+    "analytics": "مقارنة المواسم",
+    "distributions": "التوزيعات",
+    "audit": "سجل التدقيق",
+    "config": "الإعدادات",
+    "seasons": "المواسم",
+    "categories": "فئات البذور",
+    "suppliers": "الموردون",
+    "users": "المستخدمون",
+    "reporting": "التقارير"
+  },
+  "actions": {
+    "start": "بدء التجربة",
+    "toReview": "إرسال للمراجعة",
+    "accept": "قبول",
+    "reject": "رفض",
+    "reset": "إعادة إلى مسودة",
+    "new": "جديد",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "viewAll": "عرض الكل",
+    "signIn": "تسجيل الدخول",
+    "signOut": "تسجيل الخروج",
+    "verify": "تحقق",
+    "enable": "تفعيل",
+    "capture": "التقاط صورة",
+    "upload": "رفع ملف"
+  },
+  "state": {
+    "DRAFT": "مسودة",
+    "IN_TRIAL": "قيد التجربة",
+    "REVIEW": "مراجعة",
+    "ACCEPTED": "مقبول",
+    "REJECTED": "مرفوض"
+  },
+  "role": {
+    "TECHNICIAN": "فني مشتل",
+    "MANAGER": "مدير تجارب",
+    "OWNER": "مالك"
+  },
+  "trial": {
+    "reference": "المرجع",
+    "seedName": "اسم البذرة / الصنف",
+    "category": "فئة البذرة",
+    "season": "الموسم",
+    "germinationRate": "نسبة الإنبات",
+    "purity": "النقاوة",
+    "npk": "NPK",
+    "shelfLife": "العمر الافتراضي",
+    "country": "بلد المنشأ",
+    "supplier": "المورّد",
+    "batch": "رقم باتش المورد",
+    "manager": "مدير التجربة",
+    "dateStart": "بداية التجربة",
+    "dateEnd": "نهاية التجربة",
+    "decision": "القرار",
+    "decidedBy": "بواسطة",
+    "decisionDate": "تاريخ القرار",
+    "rejectionReason": "سبب الرفض",
+    "avgGermination": "متوسط الإنبات",
+    "avgGrowth": "متوسط النمو",
+    "avgProduction": "متوسط الإنتاج",
+    "product": "المنتج",
+    "tabAgronomy": "البيانات الزراعية",
+    "tabDistributions": "التوزيعات",
+    "tabFollowups": "المتابعات",
+    "tabResults": "النتائج والقرار"
+  },
+  "followup": {
+    "distribution": "التوزيع (المشتل)",
+    "measurementDate": "تاريخ القياس",
+    "growthCm": "النمو (سم)",
+    "productionQty": "الإنتاج",
+    "notes": "ملاحظات",
+    "recordedBy": "سجّلها",
+    "image": "صورة حقلية",
+    "labResult": "نتيجة مخبرية",
+    "reportPdf": "تقرير PDF",
+    "attachments": "المرفقات",
+    "timeline": "الخط الزمني للمتابعات"
+  },
+  "nursery": {
+    "name": "الاسم",
+    "code": "الرمز",
+    "location": "الموقع",
+    "area": "المساحة (هكتار)",
+    "technicians": "الفنيون",
+    "trialCount": "عدد التجارب"
+  },
+  "confirm": {
+    "acceptTitle": "قبول التجربة",
+    "acceptBody": "سيؤدي القبول إلى إنشاء منتج في كتالوج المبيعات. هل تريد المتابعة؟",
+    "resetBody": "إعادة إلى مسودة؟ سيظل المنتج المرتبط (إن وُجد) محفوظاً.",
+    "deleteBody": "هل أنت متأكد من الحذف؟ لا يمكن التراجع."
+  },
+  "errors": {
+    "germRange": "يجب أن تكون نسبة الإنبات بين 0 و100.",
+    "purityRange": "يجب أن تكون النقاوة بين 0 و100.",
+    "nonNegative": "يجب أن تكون القيمة أكبر من أو تساوي صفر.",
+    "dateOrder": "لا يمكن أن تكون نهاية التجربة قبل بدايتها.",
+    "distUnique": "لا يمكن توزيع التجربة لأكثر من مرة على نفس المشتل.",
+    "rejectReason": "يرجى إدخال سبب الرفض قبل رفض التجربة.",
+    "denied": "ليست لديك صلاحية لهذا الإجراء.",
+    "invalidCredentials": "بيانات الدخول غير صحيحة.",
+    "invalidOtp": "الرمز غير صحيح."
+  },
+  "empty": {
+    "trials": "أنشئ أول تجربة بذور.",
+    "followups": "لا توجد متابعات بعد.",
+    "generic": "لا توجد بيانات."
+  },
+  "common": {
+    "search": "بحث",
+    "filters": "تصفية",
+    "groupBy": "تجميع حسب",
+    "loading": "جارٍ التحميل…",
+    "all": "الكل",
+    "yes": "نعم",
+    "no": "لا",
+    "language": "اللغة"
+  }
+}

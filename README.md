@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Al-Masa Seed Trials — Web App
 
-## Getting Started
+**مؤسسة الماسة والنبراس الزراعية / Moasasat Al Masa wa Al Nibras Alziraieh**
 
-First, run the development server:
+A standalone **Next.js** rebuild of the Odoo 17 `agri_seed_trials` module — seed-trial management with a
+`draft → in_trial → review → accepted/rejected` workflow, per-nursery distributions, time-series follow-ups,
+a per-trial PDF report, season analytics, role-based access with 2FA, and an immutable audit log.
+Arabic/RTL primary, English secondary. Deploys free on **Vercel + Neon** (serverless).
 
+## Stack
+- **Next.js 16** (App Router, TypeScript), **Tailwind v4**
+- **Prisma** → **PostgreSQL** (Neon in production)
+- **Auth.js v5** (credentials + bcrypt) with **TOTP 2FA** (mandatory for Manager/Owner)
+- **@react-pdf/renderer** (Arabic PDF report), **Recharts** (analytics), **next-intl** (ar/en, RTL)
+- **Vitest** (unit + integration), **Playwright** (E2E)
+
+## Local development
+This app uses Postgres. Two options:
+
+### Option A — local Postgres via Docker (recommended for dev)
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+docker run -d --name almasa-pg -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=almasa -p 5544:5432 postgres:16
+cp .env.example .env   # then set DATABASE_URL/DIRECT_URL to postgresql://postgres:postgres@localhost:5544/almasa
+npm install
+npm run db:reset       # push schema + apply constraints + seed demo data
+npm run dev            # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Option B — Neon
+Set `DATABASE_URL` (pooled `-pooler` host, `pgbouncer=true`) and `DIRECT_URL` (direct host) in `.env`, then
+`npm run db:push && npm run db:constraints && npm run db:seed`.
+> Some networks block outbound port 5432 — if `prisma` reports `P1001`/`ECONNRESET` against Neon locally,
+> use Option A for dev; Vercel reaches Neon fine in production.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Demo logins (password `Passw0rd!`)
+- `owner@almasa.test` (Owner) · `manager@almasa.test` (Manager) — both must enroll 2FA on first login
+- `tech@almasa.test` (Technician — assigned to North Nursery)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Scripts
+| Script | Purpose |
+|---|---|
+| `npm run dev` | Dev server |
+| `npm run build` | `prisma generate` + production build |
+| `npm run test` | Unit tests (Vitest) |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm run db:push` | Sync schema to the DB |
+| `npm run db:constraints` | Apply raw CHECK constraints + triggers (`prisma/constraints.sql`) |
+| `npm run db:seed` | Seed demo data |
+| `npm run db:reset` | push (force) + constraints + seed |
 
-## Learn More
+## Deploy (Vercel + Neon, free)
+1. Push to GitHub (this repo).
+2. Create a Neon project + database; copy the **pooled** and **direct** connection strings.
+3. Vercel → New Project → import the repo. Set env vars: `DATABASE_URL` (pooled), `DIRECT_URL` (direct),
+   `AUTH_SECRET` (`npx auth secret`), `AUTH_URL` (your URL), `BLOB_READ_WRITE_TOKEN` (for attachments).
+4. One-time DB setup against Neon: `npm run db:push && npm run db:constraints && npm run db:seed`
+   (run locally if your network allows 5432, or from any host that can reach Neon).
+5. Deploy. The build runs `prisma generate` + `next build`.
 
-To learn more about Next.js, take a look at the following resources:
+## Architecture
+- `src/lib/*` — pure, unit-tested domain logic ported 1:1 from Odoo: `workflow` (transition guards),
+  `authz` (RBAC + record-scoping), `audit` (field diffing), `sequence` (ST/YYYY/####), `aggregates`,
+  `product` (accept→catalog product), `npk`, `validation` (zod mirroring DB CHECKs).
+- `src/server/*` — server actions + scoped queries (trials, followups, distributions, config, analytics,
+  audit). Every mutation enforces authz first and logs audit rows in-transaction.
+- `src/app/*` — App Router pages (login, 2FA, dashboard, trials, follow-ups, analytics, audit, settings)
+  + the PDF route handler.
+- `prisma/schema.prisma` + `prisma/constraints.sql` — data model; CHECK constraints, the followup↔
+  distribution trial-consistency trigger, and audit-log append-only triggers live in the SQL file.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Testing
+- **Unit** (`npm run test`): 77 tests covering the full workflow matrix, authz scoping, audit diffing,
+  validation boundaries, sequence formatting, aggregates, product mapping, NPK.
+- **Integration / E2E**: see `.github/workflows/ci.yml` (Postgres service + schema + constraints + build).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Provenance
+Behavioral source of truth: the Odoo module at `agri_seed_trials`. Field names, workflow guards, the
+accept→product mapping, AUDIT_FIELDS, record rules, and the report layout are ported to match.

@@ -1,0 +1,265 @@
+// Al-Masa Seed Trials — standalone rebuild of the Odoo agri_seed_trials module.
+// CHECK constraints, the followup↔distribution trial-consistency trigger, and audit-log
+// immutability are added in a hand-written raw migration (Prisma has no native CHECK).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL") // Neon POOLED host (serverless)
+  directUrl = env("DIRECT_URL") // Neon DIRECT host (migrations)
+}
+
+enum Role {
+  TECHNICIAN
+  MANAGER
+  OWNER
+}
+
+enum TrialState {
+  DRAFT
+  IN_TRIAL
+  REVIEW
+  ACCEPTED
+  REJECTED
+}
+
+enum AuditAction {
+  CREATE
+  STATE_CHANGE
+  FIELD_EDIT
+  ACCEPT
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         Role     @default(TECHNICIAN)
+  totpSecret   String?
+  totpEnabled  Boolean  @default(false)
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  managedTrials Trial[]        @relation("TrialManager")
+  createdTrials Trial[]        @relation("TrialCreatedBy")
+  decidedTrials Trial[]        @relation("TrialDecisionUser")
+  nurseries     Nursery[]      @relation("NurseryTechnicians")
+  distributions Distribution[]
+  followups     Followup[]
+  auditLogs     AuditLog[]
+}
+
+model Season {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  code      String?
+  dateStart DateTime? @db.Date
+  dateEnd   DateTime? @db.Date
+  active    Boolean   @default(true)
+  trials        Trial[]
+  distributions Distribution[]
+  followups     Followup[]
+}
+
+model SeedCategory {
+  id     String  @id @default(cuid())
+  name   String  @unique
+  code   String?
+  active Boolean @default(true)
+  trials Trial[]
+}
+
+model Supplier {
+  id     String  @id @default(cuid())
+  name   String
+  ref    String?
+  active Boolean @default(true)
+  trials Trial[]
+}
+
+model Country {
+  id     String  @id @default(cuid())
+  code   String  @unique // ISO-2
+  nameAr String
+  nameEn String
+  trials Trial[]
+}
+
+model Nursery {
+  id          String   @id @default(cuid())
+  name        String
+  code        String?
+  location    String?
+  areaHectare Decimal? @db.Decimal(10, 2)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  technicians   User[]         @relation("NurseryTechnicians")
+  distributions Distribution[]
+}
+
+model Product {
+  id              String   @id @default(cuid())
+  name            String
+  defaultCode     String?
+  salePrice       Decimal  @default(0) @db.Decimal(12, 2)
+  saleOk          Boolean  @default(true)
+  purchaseOk      Boolean  @default(false)
+  productType     String   @default("consu")
+  descriptionSale String?
+  createdAt       DateTime @default(now())
+
+  trial Trial?
+}
+
+model Trial {
+  id                  String     @id @default(cuid())
+  code                String     @unique
+  seedName            String
+  state               TrialState @default(DRAFT)
+  categoryId          String?
+  seasonId            String?
+  countryId           String?
+  supplierId          String?
+  germinationRate     Decimal?   @db.Decimal(5, 2)
+  purity              Decimal?   @db.Decimal(5, 2)
+  npkN                Decimal?   @db.Decimal(6, 2)
+  npkP                Decimal?   @db.Decimal(6, 2)
+  npkK                Decimal?   @db.Decimal(6, 2)
+  shelfLife           Int?
+  supplierBatchNumber String?
+  dateStart           DateTime?  @db.Date
+  dateEnd             DateTime?  @db.Date
+  managerId           String?
+  decisionDate        DateTime?
+  decisionUserId      String?
+  rejectionReason     String?
+  productId           String?    @unique
+  // Stored aggregates (recomputed in-tx from followups) — feed analytics, mirror Odoo store=True.
+  avgGermination      Decimal    @default(0) @db.Decimal(5, 2)
+  avgGrowth           Decimal    @default(0) @db.Decimal(8, 2)
+  avgProduction       Decimal    @default(0) @db.Decimal(12, 2)
+  createdById         String?
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  category     SeedCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  season       Season?       @relation(fields: [seasonId], references: [id], onDelete: SetNull)
+  country      Country?      @relation(fields: [countryId], references: [id], onDelete: SetNull)
+  supplier     Supplier?     @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  manager      User?         @relation("TrialManager", fields: [managerId], references: [id], onDelete: SetNull)
+  decisionUser User?         @relation("TrialDecisionUser", fields: [decisionUserId], references: [id], onDelete: SetNull)
+  createdBy    User?         @relation("TrialCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  product      Product?      @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  distributions Distribution[]
+  followups     Followup[]
+  auditLogs     AuditLog[]
+
+  @@index([state])
+  @@index([seasonId])
+  @@index([dateStart])
+}
+
+model Distribution {
+  id               String    @id @default(cuid())
+  trialId          String
+  nurseryId        String
+  seasonId         String?
+  distributedQty   Decimal?  @db.Decimal(12, 2)
+  distributionDate DateTime? @db.Date
+  technicianId     String?
+  avgGermination   Decimal   @default(0) @db.Decimal(5, 2)
+  avgGrowth        Decimal   @default(0) @db.Decimal(8, 2)
+  avgProduction    Decimal   @default(0) @db.Decimal(12, 2)
+  createdAt        DateTime  @default(now())
+
+  trial      Trial      @relation(fields: [trialId], references: [id], onDelete: Cascade)
+  nursery    Nursery    @relation(fields: [nurseryId], references: [id], onDelete: Restrict)
+  technician User?      @relation(fields: [technicianId], references: [id], onDelete: SetNull)
+  season     Season?    @relation(fields: [seasonId], references: [id], onDelete: SetNull)
+  followups  Followup[]
+
+  @@unique([trialId, nurseryId])
+  @@index([nurseryId])
+}
+
+model Followup {
+  id                String   @id @default(cuid())
+  distributionId    String
+  trialId           String
+  nurseryId         String?
+  seasonId          String?
+  measurementDate   DateTime @db.Date
+  germinationRate   Decimal? @db.Decimal(5, 2)
+  growthCm          Decimal? @db.Decimal(8, 2)
+  productionQty     Decimal? @db.Decimal(12, 2)
+  notes             String?
+  recordedById      String?
+  imageUrl          String?
+  labResultUrl      String?
+  labResultFilename String?
+  reportPdfUrl      String?
+  reportPdfFilename String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  distribution Distribution         @relation(fields: [distributionId], references: [id], onDelete: Cascade)
+  trial        Trial                @relation(fields: [trialId], references: [id], onDelete: Cascade)
+  recordedBy   User?                @relation(fields: [recordedById], references: [id], onDelete: SetNull)
+  season       Season?              @relation(fields: [seasonId], references: [id], onDelete: SetNull)
+  attachments  FollowupAttachment[]
+
+  @@index([trialId])
+  @@index([distributionId])
+  @@index([measurementDate])
+}
+
+model FollowupAttachment {
+  id           String   @id @default(cuid())
+  followupId   String
+  url          String
+  filename     String
+  contentType  String?
+  size         Int?
+  uploadedById String?
+  createdAt    DateTime @default(now())
+
+  followup Followup @relation(fields: [followupId], references: [id], onDelete: Cascade)
+
+  @@index([followupId])
+}
+
+// Append-only. Immutability enforced by a DB trigger (raw migration); no update/delete in app.
+model AuditLog {
+  id          String      @id @default(cuid())
+  logDate     DateTime    @default(now())
+  userId      String?
+  resModel    String
+  resId       String
+  resName     String?
+  trialId     String?
+  action      AuditAction
+  fieldName   String?
+  oldValue    String?
+  newValue    String?
+  description String?
+
+  user  User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+  trial Trial? @relation(fields: [trialId], references: [id], onDelete: SetNull)
+
+  @@index([logDate])
+  @@index([trialId])
+  @@index([resModel, resId])
+}
+
+// Race-safe trial code allocation: ST/<year>/#### via an atomic upsert per year.
+model TrialCounter {
+  year      Int @id
+  lastValue Int @default(0)
+}

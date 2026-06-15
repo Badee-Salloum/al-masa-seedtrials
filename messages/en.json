@@ -1,0 +1,133 @@
+{
+  "app": {
+    "name": "Seed Trials",
+    "org": "Moasasat Al Masa wa Al Nibras Alziraieh"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "trials": "Trials",
+    "nurseries": "Nurseries",
+    "followups": "Follow-ups",
+    "analytics": "Season Comparison",
+    "distributions": "Distributions",
+    "audit": "Audit Log",
+    "config": "Configuration",
+    "seasons": "Seasons",
+    "categories": "Seed Categories",
+    "suppliers": "Suppliers",
+    "users": "Users",
+    "reporting": "Reporting"
+  },
+  "actions": {
+    "start": "Start Trial",
+    "toReview": "Send to Review",
+    "accept": "Accept",
+    "reject": "Reject",
+    "reset": "Reset to Draft",
+    "new": "New",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "viewAll": "View all",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "verify": "Verify",
+    "enable": "Enable",
+    "capture": "Capture photo",
+    "upload": "Upload file"
+  },
+  "state": {
+    "DRAFT": "Draft",
+    "IN_TRIAL": "In Trial",
+    "REVIEW": "Review",
+    "ACCEPTED": "Accepted",
+    "REJECTED": "Rejected"
+  },
+  "role": {
+    "TECHNICIAN": "Nursery Technician",
+    "MANAGER": "Trial Manager",
+    "OWNER": "Owner"
+  },
+  "trial": {
+    "reference": "Reference",
+    "seedName": "Seed / Variety Name",
+    "category": "Seed Category",
+    "season": "Season",
+    "germinationRate": "Germination Rate",
+    "purity": "Purity",
+    "npk": "NPK",
+    "shelfLife": "Shelf Life",
+    "country": "Country of Origin",
+    "supplier": "Supplier",
+    "batch": "Supplier Batch",
+    "manager": "Trial Manager",
+    "dateStart": "Trial Start",
+    "dateEnd": "Trial End",
+    "decision": "Decision",
+    "decidedBy": "Decided By",
+    "decisionDate": "Decision Date",
+    "rejectionReason": "Rejection Reason",
+    "avgGermination": "Avg Germination",
+    "avgGrowth": "Avg Growth",
+    "avgProduction": "Avg Production",
+    "product": "Product",
+    "tabAgronomy": "Agronomy",
+    "tabDistributions": "Distributions",
+    "tabFollowups": "Follow-ups",
+    "tabResults": "Results & Decision"
+  },
+  "followup": {
+    "distribution": "Distribution (Nursery)",
+    "measurementDate": "Measurement Date",
+    "growthCm": "Growth (cm)",
+    "productionQty": "Production",
+    "notes": "Notes",
+    "recordedBy": "Recorded By",
+    "image": "Field Image",
+    "labResult": "Lab Result",
+    "reportPdf": "PDF Report",
+    "attachments": "Attachments",
+    "timeline": "Follow-up Timeline"
+  },
+  "nursery": {
+    "name": "Name",
+    "code": "Code",
+    "location": "Location",
+    "area": "Area (ha)",
+    "technicians": "Technicians",
+    "trialCount": "Trials"
+  },
+  "confirm": {
+    "acceptTitle": "Accept trial",
+    "acceptBody": "Accepting will create a product in the sales catalog. Continue?",
+    "resetBody": "Reset to draft? The linked product (if any) will be retained.",
+    "deleteBody": "Are you sure? This cannot be undone."
+  },
+  "errors": {
+    "germRange": "Germination rate must be between 0 and 100.",
+    "purityRange": "Purity must be between 0 and 100.",
+    "nonNegative": "Value must be greater than or equal to 0.",
+    "dateOrder": "Trial End cannot be earlier than Trial Start.",
+    "distUnique": "A trial can only be distributed once per nursery.",
+    "rejectReason": "Please provide a rejection reason before rejecting the trial.",
+    "denied": "You don't have permission for this action.",
+    "invalidCredentials": "Invalid credentials.",
+    "invalidOtp": "Invalid code."
+  },
+  "empty": {
+    "trials": "Create your first seed trial.",
+    "followups": "No follow-ups recorded yet.",
+    "generic": "No data."
+  },
+  "common": {
+    "search": "Search",
+    "filters": "Filters",
+    "groupBy": "Group by",
+    "loading": "Loading…",
+    "all": "All",
+    "yes": "Yes",
+    "no": "No",
+    "language": "Language"
+  }
+}

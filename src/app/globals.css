@@ -1,26 +1,53 @@
 @import "tailwindcss";
 
+/* Al-Masa brand design tokens (a11y-fixed: sky/lime are fills only; actions use darker shades). */
+@theme {
+  --color-brand-sky: #3fb1d4; /* fills, large/decorative, chart series — never body text */
+  --color-brand-blue: #2e9ec4; /* top-bar, accents */
+  --color-brand-action: #1f7e9c; /* primary button bg (white text ≥4.5:1) */
+  --color-brand-action-hover: #196a84;
+  --color-brand-link: #247e9e; /* inline link text on white */
+  --color-brand-lime: #8cc63f; /* brand accent, timeline dots, dividers — never text */
+  --color-brand-lime-700: #6fa92e;
+
+  --color-bg: #f7fafc;
+  --color-surface: #ffffff;
+  --color-border: #e3e8ef;
+  --color-muted: #64748b;
+  --color-ink: #1e293b;
+  --color-ink-strong: #0f172a;
+
+  --color-success: #2e8b30;
+  --color-success-tint: #e7f5e6;
+  --color-warning: #e0a800;
+  --color-warning-tint: #fcf3d6;
+  --color-danger: #d64545;
+  --color-danger-tint: #fbe7e7;
+  --color-info: #2e9ec4;
+  --color-info-tint: #d2eef6;
+  --color-draft: #64748b;
+  --color-draft-tint: #eef1f5;
+
+  --font-sans: var(--font-cairo), var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: var(--color-bg);
+  --foreground: var(--color-ink);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+/* Arabic glyphs run a touch taller — give RTL a bit more line-height. */
+html[dir="rtl"] body {
+  line-height: 1.75;
 }
