@@ -5,7 +5,9 @@
 A standalone **Next.js** rebuild of the Odoo 17 `agri_seed_trials` module — seed-trial management with a
 `draft → in_trial → review → accepted/rejected` workflow, per-nursery distributions, time-series follow-ups,
 a per-trial PDF report, season analytics, role-based access with 2FA, and an immutable audit log.
-Arabic/RTL primary, English secondary. Deploys free on **Vercel + Neon** (serverless).
+Arabic/RTL primary, English secondary. Runs free on **Vercel + Neon** (serverless).
+
+**🚀 Live:** https://al-masa-seedtrials.vercel.app — demo logins below (password `Passw0rd!`).
 
 ## Stack
 - **Next.js 16** (App Router, TypeScript), **Tailwind v4**
@@ -55,7 +57,13 @@ Set `DATABASE_URL` (pooled `-pooler` host, `pgbouncer=true`) and `DIRECT_URL` (d
    `AUTH_SECRET` (`npx auth secret`), `AUTH_URL` (your URL), `BLOB_READ_WRITE_TOKEN` (for attachments).
 4. One-time DB setup against Neon: `npm run db:push && npm run db:constraints && npm run db:seed`
    (run locally if your network allows 5432, or from any host that can reach Neon).
+   - **If your network blocks port 5432** (some ISPs do): provision over HTTPS instead with
+     `npx prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script > prisma/_init.sql`
+     then `NEON_URL="<pooled-url>" npx tsx prisma/provision-neon.ts` (schema + constraints + seed over 443).
 5. Deploy. The build runs `prisma generate` + `next build`.
+
+> This instance is already deployed at the Live URL above (Neon DB provisioned over HTTPS, Vercel env:
+> `DATABASE_URL`, `DIRECT_URL`, `AUTH_SECRET`, `AUTH_URL`, `AUTH_TRUST_HOST`).
 
 ## Architecture
 - `src/lib/*` — pure, unit-tested domain logic ported 1:1 from Odoo: `workflow` (transition guards),
