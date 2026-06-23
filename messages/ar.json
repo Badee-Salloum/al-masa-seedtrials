@@ -49,6 +49,16 @@
     "MANAGER": "مدير تجارب",
     "OWNER": "مالك"
   },
+  "user": {
+    "name": "الاسم",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "role": "الدور",
+    "twoFactor": "المصادقة الثنائية",
+    "status": "الحالة",
+    "active": "نشط",
+    "addTechnician": "إضافة فني مشتل"
+  },
   "trial": {
     "reference": "المرجع",
     "seedName": "اسم البذرة / الصنف",

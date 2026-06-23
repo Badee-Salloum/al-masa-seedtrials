@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { getSessionUser } from "@/lib/session";
-import { canManageConfig } from "@/lib/authz";
+import { canManageConfig, canManageUsers } from "@/lib/authz";
 import { PageHeader } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
@@ -27,6 +27,11 @@ export default async function SettingsLayout({
         <Link href="/settings/nurseries" className="text-brand-link hover:underline">
           {t("nav.nurseries")}
         </Link>
+        {canManageUsers(user.role) && (
+          <Link href="/settings/users" className="text-brand-link hover:underline">
+            {t("nav.users")}
+          </Link>
+        )}
       </div>
       {children}
     </div>

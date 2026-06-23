@@ -49,6 +49,16 @@
     "MANAGER": "Trial Manager",
     "OWNER": "Owner"
   },
+  "user": {
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "role": "Role",
+    "twoFactor": "2FA",
+    "status": "Status",
+    "active": "Active",
+    "addTechnician": "Add nursery technician"
+  },
   "trial": {
     "reference": "Reference",
     "seedName": "Seed / Variety Name",
