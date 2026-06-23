@@ -9,13 +9,23 @@ export interface SessionUser {
 
 const RANK: Record<Role, number> = {
   [Role.TECHNICIAN]: 1,
-  [Role.MANAGER]: 2,
-  [Role.OWNER]: 3,
+  [Role.ENGINEER]: 2,
+  [Role.MANAGER]: 3,
+  [Role.OWNER]: 4,
 };
 
 export function hasAtLeast(role: Role, min: Role): boolean {
   return RANK[role] >= RANK[min];
 }
+
+// Engineer is an analyst: org-wide READ of trials/analytics, writes a recommendation, but
+// no management/decision rights. So it's not purely linear — handle it explicitly.
+export const canSeeAllTrials = (r: Role) =>
+  r === Role.ENGINEER || hasAtLeast(r, Role.MANAGER);
+export const canAnalyze = (r: Role) =>
+  r === Role.ENGINEER || hasAtLeast(r, Role.MANAGER);
+export const canSeeAnalytics = (r: Role) =>
+  r === Role.ENGINEER || hasAtLeast(r, Role.MANAGER);
 
 // Model-level capabilities (port of ir.model.access.csv + record-rule perms).
 export const canCreateTrial = (r: Role) => hasAtLeast(r, Role.MANAGER);
@@ -29,9 +39,9 @@ export const canReadAudit = (r: Role) => hasAtLeast(r, Role.MANAGER);
 export const canManageConfig = (r: Role) => hasAtLeast(r, Role.MANAGER);
 export const canManageUsers = (r: Role) => r === Role.OWNER;
 
-// Record-scoping where-clauses (managers/owners unrestricted).
+// Record-scoping where-clauses (managers/owners/engineers see all; technicians scoped to nursery).
 export function scopeTrialsWhere(u: SessionUser) {
-  if (hasAtLeast(u.role, Role.MANAGER)) return {};
+  if (canSeeAllTrials(u.role)) return {};
   return {
     OR: [
       { distributions: { some: { nursery: { technicians: { some: { id: u.id } } } } } },
@@ -41,12 +51,12 @@ export function scopeTrialsWhere(u: SessionUser) {
 }
 
 export function scopeDistributionsWhere(u: SessionUser) {
-  if (hasAtLeast(u.role, Role.MANAGER)) return {};
+  if (canSeeAllTrials(u.role)) return {};
   return { nursery: { technicians: { some: { id: u.id } } } };
 }
 
 export function scopeFollowupsWhere(u: SessionUser) {
-  if (hasAtLeast(u.role, Role.MANAGER)) return {};
+  if (canSeeAllTrials(u.role)) return {};
   return { distribution: { nursery: { technicians: { some: { id: u.id } } } } };
 }
 

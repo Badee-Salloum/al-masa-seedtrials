@@ -46,6 +46,7 @@
   },
   "role": {
     "TECHNICIAN": "Nursery Technician",
+    "ENGINEER": "Agronomist",
     "MANAGER": "Trial Manager",
     "OWNER": "Owner"
   },
@@ -85,7 +86,15 @@
     "tabAgronomy": "Agronomy",
     "tabDistributions": "Distributions",
     "tabFollowups": "Follow-ups",
-    "tabResults": "Results & Decision"
+    "tabResults": "Results & Decision",
+    "tabAnalysis": "Engineer Analysis",
+    "analysisNote": "Analysis notes",
+    "recommendation": "Recommendation",
+    "recommendAccept": "Recommend accept",
+    "recommendReject": "Recommend reject",
+    "analyzedBy": "Analyzed by",
+    "saveAnalysis": "Save analysis",
+    "noRecommendation": "No recommendation"
   },
   "followup": {
     "distribution": "Distribution (Nursery)",

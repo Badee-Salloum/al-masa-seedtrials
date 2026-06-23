@@ -46,6 +46,7 @@
   },
   "role": {
     "TECHNICIAN": "فني مشتل",
+    "ENGINEER": "مهندس زراعي",
     "MANAGER": "مدير تجارب",
     "OWNER": "مالك"
   },
@@ -85,7 +86,15 @@
     "tabAgronomy": "البيانات الزراعية",
     "tabDistributions": "التوزيعات",
     "tabFollowups": "المتابعات",
-    "tabResults": "النتائج والقرار"
+    "tabResults": "النتائج والقرار",
+    "tabAnalysis": "تحليل المهندس",
+    "analysisNote": "ملاحظات التحليل",
+    "recommendation": "التوصية",
+    "recommendAccept": "يوصى بالقبول",
+    "recommendReject": "يوصى بالرفض",
+    "analyzedBy": "حلّلها المهندس",
+    "saveAnalysis": "حفظ التحليل",
+    "noRecommendation": "بدون توصية"
   },
   "followup": {
     "distribution": "التوزيع (المشتل)",

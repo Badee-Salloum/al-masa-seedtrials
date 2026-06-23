@@ -34,6 +34,7 @@ export async function getTrial(user: SessionUser, id: string) {
       supplier: true,
       manager: true,
       decisionUser: true,
+      analyzedBy: true,
       product: true,
       distributions: {
         include: { nursery: true, technician: true },

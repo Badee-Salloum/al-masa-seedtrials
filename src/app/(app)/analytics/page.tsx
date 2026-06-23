@@ -1,8 +1,7 @@
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getSessionUser } from "@/lib/session";
-import { hasAtLeast } from "@/lib/authz";
-import { Role } from "@prisma/client";
+import { canSeeAnalytics } from "@/lib/authz";
 import { seasonComparison } from "@/server/analytics";
 import { Card, EmptyState, PageHeader } from "@/components/ui";
 import { SeasonCharts } from "@/components/analytics/SeasonCharts";
@@ -12,7 +11,7 @@ export const dynamic = "force-dynamic";
 export default async function AnalyticsPage() {
   const user = await getSessionUser();
   if (!user) redirect("/login");
-  if (!hasAtLeast(user.role, Role.MANAGER)) redirect("/dashboard");
+  if (!canSeeAnalytics(user.role)) redirect("/dashboard");
   const t = await getTranslations();
   const { seasons, bySeason } = await seasonComparison(user);
   const nameOf = new Map(seasons.map((s) => [s.id, s.name]));

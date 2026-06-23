@@ -14,8 +14,14 @@ datasource db {
 
 enum Role {
   TECHNICIAN
+  ENGINEER
   MANAGER
   OWNER
+}
+
+enum Recommendation {
+  ACCEPT
+  REJECT
 }
 
 enum TrialState {
@@ -45,9 +51,10 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  managedTrials Trial[]        @relation("TrialManager")
-  createdTrials Trial[]        @relation("TrialCreatedBy")
-  decidedTrials Trial[]        @relation("TrialDecisionUser")
+  managedTrials  Trial[]       @relation("TrialManager")
+  createdTrials  Trial[]       @relation("TrialCreatedBy")
+  decidedTrials  Trial[]       @relation("TrialDecisionUser")
+  analyzedTrials Trial[]       @relation("TrialAnalyst")
   nurseries     Nursery[]      @relation("NurseryTechnicians")
   distributions Distribution[]
   followups     Followup[]
@@ -139,6 +146,11 @@ model Trial {
   decisionDate        DateTime?
   decisionUserId      String?
   rejectionReason     String?
+  // Engineer/agronomist analysis (review stage) — recommendation only; manager decides.
+  analysisNote        String?
+  recommendation      Recommendation?
+  analyzedById        String?
+  analyzedAt          DateTime?
   productId           String?    @unique
   // Stored aggregates (recomputed in-tx from followups) — feed analytics, mirror Odoo store=True.
   avgGermination      Decimal    @default(0) @db.Decimal(5, 2)
@@ -154,6 +166,7 @@ model Trial {
   supplier     Supplier?     @relation(fields: [supplierId], references: [id], onDelete: SetNull)
   manager      User?         @relation("TrialManager", fields: [managerId], references: [id], onDelete: SetNull)
   decisionUser User?         @relation("TrialDecisionUser", fields: [decisionUserId], references: [id], onDelete: SetNull)
+  analyzedBy   User?         @relation("TrialAnalyst", fields: [analyzedById], references: [id], onDelete: SetNull)
   createdBy    User?         @relation("TrialCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
   product      Product?      @relation(fields: [productId], references: [id], onDelete: SetNull)
 

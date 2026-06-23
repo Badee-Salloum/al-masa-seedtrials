@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { Role } from "@prisma/client";
-import { hasAtLeast } from "@/lib/authz";
+import { hasAtLeast, canSeeAnalytics } from "@/lib/authz";
 import { Logo } from "@/components/brand/Logo";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 import { SignOutButton } from "./SignOutButton";
@@ -24,9 +24,10 @@ export function AppShell({
     { href: "/trials", label: t("nav.trials") },
     { href: "/nurseries", label: t("nav.nurseries") },
     { href: "/followups", label: t("nav.followups") },
+    // Engineers see analytics + all trials, but not management screens.
+    ...(canSeeAnalytics(role) ? [{ href: "/analytics", label: t("nav.analytics") }] : []),
     ...(isMgr
       ? [
-          { href: "/analytics", label: t("nav.analytics") },
           { href: "/distributions", label: t("nav.distributions") },
           { href: "/audit", label: t("nav.audit") },
           { href: "/settings/seasons", label: t("nav.config") },

@@ -2,7 +2,10 @@
 CREATE SCHEMA IF NOT EXISTS "public";
 
 -- CreateEnum
-CREATE TYPE "Role" AS ENUM ('TECHNICIAN', 'MANAGER', 'OWNER');
+CREATE TYPE "Role" AS ENUM ('TECHNICIAN', 'ENGINEER', 'MANAGER', 'OWNER');
+
+-- CreateEnum
+CREATE TYPE "Recommendation" AS ENUM ('ACCEPT', 'REJECT');
 
 -- CreateEnum
 CREATE TYPE "TrialState" AS ENUM ('DRAFT', 'IN_TRIAL', 'REVIEW', 'ACCEPTED', 'REJECTED');
@@ -119,6 +122,10 @@ CREATE TABLE "Trial" (
     "decisionDate" TIMESTAMP(3),
     "decisionUserId" TEXT,
     "rejectionReason" TEXT,
+    "analysisNote" TEXT,
+    "recommendation" "Recommendation",
+    "analyzedById" TEXT,
+    "analyzedAt" TIMESTAMP(3),
     "productId" TEXT,
     "avgGermination" DECIMAL(5,2) NOT NULL DEFAULT 0,
     "avgGrowth" DECIMAL(8,2) NOT NULL DEFAULT 0,
@@ -293,6 +300,9 @@ ALTER TABLE "Trial" ADD CONSTRAINT "Trial_managerId_fkey" FOREIGN KEY ("managerI
 
 -- AddForeignKey
 ALTER TABLE "Trial" ADD CONSTRAINT "Trial_decisionUserId_fkey" FOREIGN KEY ("decisionUserId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Trial" ADD CONSTRAINT "Trial_analyzedById_fkey" FOREIGN KEY ("analyzedById") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Trial" ADD CONSTRAINT "Trial_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;

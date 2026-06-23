@@ -3,11 +3,12 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { getSessionUser } from "@/lib/session";
 import { getTrial, getTrialAudit } from "@/server/queries";
-import { hasAtLeast } from "@/lib/authz";
+import { hasAtLeast, canAnalyze } from "@/lib/authz";
 import { Role } from "@prisma/client";
 import { Button, Card } from "@/components/ui";
 import { StateBadge } from "@/components/StateBadge";
 import { WorkflowButtons } from "@/components/trials/WorkflowButtons";
+import { AnalysisForm } from "@/components/trials/AnalysisForm";
 import { fmtNum, fmtDate, AUDIT_DOT } from "@/lib/ui";
 import { formatNpk } from "@/lib/npk";
 
@@ -92,6 +93,32 @@ export default async function TrialDetailPage({
           )}
         </Card>
       </div>
+
+      {/* Engineer analysis (review stage) */}
+      <Card>
+        <h2 className="mb-3 font-semibold text-ink-strong">{t("trial.tabAnalysis")}</h2>
+        <div className="mb-3 grid gap-1 text-sm">
+          <KV
+            label={t("trial.recommendation")}
+            value={
+              trial.recommendation === "ACCEPT"
+                ? t("trial.recommendAccept")
+                : trial.recommendation === "REJECT"
+                  ? t("trial.recommendReject")
+                  : t("trial.noRecommendation")
+            }
+          />
+          <KV label={t("trial.analyzedBy")} value={trial.analyzedBy?.name} />
+          <KV label={t("trial.analysisNote")} value={trial.analysisNote} />
+        </div>
+        {canAnalyze(user.role) && trial.state !== "ACCEPTED" && trial.state !== "REJECTED" && (
+          <AnalysisForm
+            trialId={trial.id}
+            note={trial.analysisNote}
+            recommendation={trial.recommendation}
+          />
+        )}
+      </Card>
 
       {/* Distributions */}
       <Card>

@@ -6,6 +6,9 @@ import {
   canDeleteTrial,
   canAcceptTrial,
   canReadAudit,
+  canAnalyze,
+  canSeeAllTrials,
+  canSeeAnalytics,
   scopeTrialsWhere,
   scopeFollowupsWhere,
 } from "./authz";
@@ -52,4 +55,25 @@ describe("scopeFollowupsWhere", () => {
     }));
   it("owner unrestricted", () =>
     expect(scopeFollowupsWhere({ id: "u2", role: Role.OWNER })).toEqual({}));
+});
+
+describe("ENGINEER role (analyst: org-wide read + recommend, no decision)", () => {
+  it("ranks above technician, below manager", () => {
+    expect(hasAtLeast(Role.ENGINEER, Role.TECHNICIAN)).toBe(true);
+    expect(hasAtLeast(Role.ENGINEER, Role.MANAGER)).toBe(false);
+  });
+  it("can analyze, see all trials and analytics", () => {
+    expect(canAnalyze(Role.ENGINEER)).toBe(true);
+    expect(canSeeAllTrials(Role.ENGINEER)).toBe(true);
+    expect(canSeeAnalytics(Role.ENGINEER)).toBe(true);
+  });
+  it("sees all trials (no nursery scoping)", () =>
+    expect(scopeTrialsWhere({ id: "e1", role: Role.ENGINEER })).toEqual({}));
+  it("cannot create/accept/delete trials or read audit", () => {
+    expect(canCreateTrial(Role.ENGINEER)).toBe(false);
+    expect(canAcceptTrial(Role.ENGINEER)).toBe(false);
+    expect(canDeleteTrial(Role.ENGINEER)).toBe(false);
+    expect(canReadAudit(Role.ENGINEER)).toBe(false);
+  });
+  it("technician cannot analyze", () => expect(canAnalyze(Role.TECHNICIAN)).toBe(false));
 });

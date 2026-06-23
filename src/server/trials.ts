@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { Prisma, TrialState } from "@prisma/client";
+import { Prisma, TrialState, Recommendation, Role } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireSessionUser } from "@/lib/session";
 import {
@@ -12,10 +12,10 @@ import {
   canAcceptTrial,
   canRejectTrial,
   canResetTrial,
+  canAnalyze,
   scopeTrialsWhere,
   AuthzError,
 } from "@/lib/authz";
-import { Role } from "@prisma/client";
 import { trialSchema } from "@/lib/validation";
 import { nextTrialCode } from "@/lib/sequence";
 import { prepareProductVals } from "@/lib/product";
@@ -222,4 +222,33 @@ export async function rejectTrial(id: string, rejectionReason: string) {
 }
 export async function resetToDraft(id: string) {
   return transition(id, "resetToDraft");
+}
+
+// Engineer/agronomist analysis at the review stage — recommendation only (manager decides).
+export async function submitAnalysis(
+  id: string,
+  input: { analysisNote?: string | null; recommendation?: "ACCEPT" | "REJECT" | "" },
+) {
+  const user = await requireSessionUser();
+  assert(canAnalyze(user.role));
+  const trial = await prisma.trial.findUniqueOrThrow({ where: { id }, select: { state: true } });
+  if (trial.state !== TrialState.IN_TRIAL && trial.state !== TrialState.REVIEW) {
+    throw new AuthzError("errors.denied");
+  }
+  const rec =
+    input.recommendation === "ACCEPT"
+      ? Recommendation.ACCEPT
+      : input.recommendation === "REJECT"
+        ? Recommendation.REJECT
+        : null;
+  await prisma.trial.update({
+    where: { id },
+    data: {
+      analysisNote: input.analysisNote?.trim() || null,
+      recommendation: rec,
+      analyzedById: user.id,
+      analyzedAt: new Date(),
+    },
+  });
+  revalidatePath(`/trials/${id}`);
 }

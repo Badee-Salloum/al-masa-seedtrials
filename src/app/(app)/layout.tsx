@@ -13,8 +13,9 @@ export default async function AppLayout({
   if (!session?.user) redirect("/login");
 
   const { role, totpEnabled } = session.user;
-  // Mandatory 2FA for managers/owners.
-  if (hasAtLeast(role, Role.MANAGER) && !totpEnabled) redirect("/setup-2fa");
+  // Mandatory 2FA for managers/owners — secure default ON; set REQUIRE_2FA="false" to relax (e.g. testing).
+  const require2fa = process.env.REQUIRE_2FA !== "false";
+  if (require2fa && hasAtLeast(role, Role.MANAGER) && !totpEnabled) redirect("/setup-2fa");
 
   return (
     <AppShell role={role} userName={session.user.name ?? ""}>
